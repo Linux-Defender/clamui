@@ -158,22 +158,17 @@ let
     }
   );
 
-  staticRustTarget = "${pkgs.stdenv.hostPlatform.parsed.cpu.name}-unknown-linux-musl";
-
-  staticCraneLib = (crane.mkLib pkgs).overrideToolchain (
-    toolchain.override { targets = [ staticRustTarget ]; }
+  staticCraneLib = (crane.mkLib pkgs.pkgsStatic).overrideToolchain (
+    staticPkgs:
+    (staticPkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml).override {
+      targets = [ staticPkgs.stdenv.hostPlatform.rust.rustcTarget ];
+    }
   );
 
-  staticXtaskArgs = xtaskArgs // {
-    pname = "xtask-static";
-    CARGO_BUILD_TARGET = staticRustTarget;
-    CARGO_BUILD_RUSTFLAGS = "-C target-feature=+crt-static";
-  };
-
   staticXtaskPackage = staticCraneLib.buildPackage (
-    staticXtaskArgs
+    xtaskArgs
     // {
-      cargoArtifacts = staticCraneLib.buildDepsOnly staticXtaskArgs;
+      cargoArtifacts = staticCraneLib.buildDepsOnly xtaskArgs;
       doCheck = false;
     }
   );

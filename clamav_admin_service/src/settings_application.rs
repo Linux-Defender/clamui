@@ -6,6 +6,7 @@ use std::{
 
 use clamd_configuration::{
     clamd_conf_format::config_lines::ClamdConfigLines,
+    host_clamd_layout,
     live_overrides::{OverridesChange, ReductionClock, SettingChanges},
     merged_clamd_config::{merge_clamd_config, tunable_settings_in},
     tunable_allowlist::TunableAllowlist,
@@ -32,7 +33,7 @@ pub struct SettingsPaths {
 impl SettingsPaths {
     pub fn on_this_host() -> Self {
         Self {
-            base_config: PathBuf::from("/etc/clamav/clamd.conf"),
+            base_config: PathBuf::from(host_clamd_layout::BASE_CLAMD_CONFIG_PATH),
             live_overrides_file: PathBuf::from("/var/lib/lazaret/live-overrides.toml"),
             previous_overrides_file: PathBuf::from("/var/lib/lazaret/clamd-overrides.conf"),
             allowlist_file: PathBuf::from("/etc/lazaret/tunable-settings"),

@@ -33,18 +33,18 @@ pub enum TaskFailure {
     PackageVersionMissing { manifest_path: &'static str },
     #[error("no <release> entry in {metainfo_path}")]
     MetainfoReleaseMissing { metainfo_path: &'static str },
-    #[error("dpkg-shlibdeps reported no dependencies")]
-    SharedLibraryDependenciesMissing,
-    #[error("no .deb file in {}", packages_directory.display())]
-    DebianPackageMissing { packages_directory: PathBuf },
     #[error("unresolved shared libraries: {library_lines}")]
     SharedLibrariesUnresolved { library_lines: String },
     #[error("{application_id} is not in the compiled schemas")]
     CompiledSchemaMissing { application_id: &'static str },
-    #[error("the package did not install {installed_path}")]
+    #[error("make install did not install {installed_path}")]
     InstalledFileMissing { installed_path: &'static str },
-    #[error("merging without runtime changes altered {base_config_path}")]
-    MergedConfigDiffers { base_config_path: &'static str },
+    #[error("none of apt-get, dnf or pacman is available to install make")]
+    PackageManagerMissing,
+    #[error("make uninstall left {installed_path} behind")]
+    UninstalledFileRemains { installed_path: &'static str },
+    #[error("merging without runtime changes altered {}", base_config_path.display())]
+    MergedConfigDiffers { base_config_path: PathBuf },
     #[error("{tool_name} failed with {exit_status}")]
     ToolFailed {
         tool_name: &'static str,

@@ -21,9 +21,8 @@ Recordings of every page are in [usage](https://codeberg.org/wvhulle/lazaret/src
 | System | Guide | Live tuning of clamd |
 |---|---|---|
 | NixOS | [NixOS module or Home Manager module](https://codeberg.org/wvhulle/lazaret/src/branch/main/docs/install/nixos.md) | yes |
-| Debian 13, Ubuntu 26.04 | [`.deb` from the releases](https://codeberg.org/wvhulle/lazaret/src/branch/main/docs/install/debian-ubuntu.md) | yes |
-| Other distributions | [Flatpak bundle from the releases](https://codeberg.org/wvhulle/lazaret/src/branch/main/docs/install/flatpak.md) | no |
-| Anywhere else | [Build from source](https://codeberg.org/wvhulle/lazaret/src/branch/main/docs/install/from-source.md) | yes, with manual steps |
+| Debian 13, Ubuntu 26.04, Fedora, Arch Linux | [Build from source with `make`](https://codeberg.org/wvhulle/lazaret/src/branch/main/docs/install/from-source.md) | yes |
+| Any distribution | [Flatpak bundle from the releases](https://codeberg.org/wvhulle/lazaret/src/branch/main/docs/install/flatpak.md) | no |
 
 ## Documentation
 

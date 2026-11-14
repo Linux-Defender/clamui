@@ -11,6 +11,7 @@ Use the Flatpak bundle on distributions without a package. It is not on Flathub:
 
 Install ClamAV with your distribution's package manager, and start the daemon and signature updates:
 
+- Debian and Ubuntu: `sudo apt install clamav clamav-daemon clamav-freshclam clamdscan`, which starts the daemon and signature updates
 - Fedora: `sudo dnf install clamav clamd clamav-update`, then `sudo systemctl enable --now clamd@scan clamav-freshclam`
 - Arch Linux: `sudo pacman -S clamav`, then `sudo systemctl enable --now clamav-daemon clamav-freshclam`
 - openSUSE: `sudo zypper install clamav`, then `sudo systemctl enable --now clamd freshclam`
@@ -46,7 +47,7 @@ Turn on **Preferences → Start in the Background**. Lazaret then asks the Backg
 
 ## Live tuning
 
-Not available in the Flatpak. Changing clamd settings needs an admin service that runs as root, and a Flatpak can't install one. Use the [Debian package](debian-ubuntu.md#live-tuning) or the [NixOS module](nixos.md#live-tuning), or edit `clamd.conf` yourself.
+Not available in the Flatpak. Changing clamd settings needs an admin service that runs as root, and a Flatpak can't install one. [Build from source](from-source.md#live-tuning) or use the [NixOS module](nixos.md#live-tuning), or edit `clamd.conf` yourself.
 
 ## API keys for reputation lookups
 

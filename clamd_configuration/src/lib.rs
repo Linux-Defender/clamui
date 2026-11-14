@@ -2,6 +2,7 @@ pub const PROTECTED_SETTING_NAMES: &str =
     include_str!("../setting_lists/protected-clamav-settings.txt");
 
 pub mod clamd_conf_format;
+pub mod host_clamd_layout;
 pub mod live_overrides;
 pub mod merged_clamd_config;
 pub mod override_reports;

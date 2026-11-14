@@ -218,13 +218,10 @@ mod release_publishing_tests {
     #[test]
     fn recognises_checksum_and_signature_files_by_extension() {
         assert!(is_release_metadata_file(Path::new(
-            "dist/lazaret_0.2.0_amd64.deb.sha256"
+            "dist/lazaret-x86_64.flatpak.sha256"
         )));
         assert!(is_release_metadata_file(Path::new(
-            "dist/lazaret_0.2.0_amd64.deb.minisig"
-        )));
-        assert!(!is_release_metadata_file(Path::new(
-            "dist/lazaret_0.2.0_amd64.deb"
+            "dist/lazaret-x86_64.flatpak.minisig"
         )));
         assert!(!is_release_metadata_file(Path::new(
             "dist/lazaret-x86_64.flatpak"

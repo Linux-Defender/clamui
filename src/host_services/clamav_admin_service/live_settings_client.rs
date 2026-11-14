@@ -33,7 +33,7 @@ const ROLLED_BACK_ANSWER: &str = "rolled-back";
 const SERVICE_UNKNOWN_ERROR: &str = "org.freedesktop.DBus.Error.ServiceUnknown";
 const ACCESS_DENIED_ERROR: &str = "org.freedesktop.DBus.Error.AccessDenied";
 pub const LIVE_OVERRIDES_PATH: &str = "/var/lib/lazaret/live-overrides.toml";
-pub const BASE_CLAMD_CONFIG_PATH: &str = "/etc/clamav/clamd.conf";
+pub use clamd_configuration::host_clamd_layout::BASE_CLAMD_CONFIG_PATH;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct OverrideSetting {

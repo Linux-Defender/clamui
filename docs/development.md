@@ -116,15 +116,15 @@ On every push to `main`, CI renders the recordings and screenshots and pushes th
 
 ## Packaging
 
-The Debian package is built inside a Debian container with the static xtask:
+There are no distribution packages. Native installs go through the Makefile (`make deps`, `make build`, `make install`, `make install-live-tuning`, `make uninstall`). `.woodpecker/source-install.yaml` checks that route in Debian, Ubuntu, Fedora and Arch containers with the static xtask:
 
 ```sh
 nix run path:.#prepare-ci-tools
-podman run --rm -v $PWD:/src -w /src debian:trixie .ci-tools/xtask ci-build-debian-package
-podman run --rm -v $PWD:/src -w /src ubuntu:26.04 .ci-tools/xtask check-debian-package-install
+podman run --rm -v $PWD:/src -w /src -e CARGO_TARGET_DIR=target/debian debian:trixie .ci-tools/xtask check-source-install
+podman run --rm -v $PWD:/src -w /src -e CARGO_TARGET_DIR=target/fedora -e CLAMD_CONFIG=/etc/clamd.d/scan.conf -e CLAMD_UNIT=clamd@scan.service fedora:latest .ci-tools/xtask check-source-install
 ```
 
-The install check installs the package with its recommended ClamAV packages and checks the shared libraries, the compiled settings schema, the admin service's polkit, D-Bus and systemd files, and that merging without runtime changes leaves `clamd.conf` unchanged.
+The check runs `make deps`, `make build` and `make install PREFIX=/usr`. It then checks the shared libraries, the compiled settings schema, the admin service's polkit, D-Bus and systemd files, and that merging without runtime changes leaves the clamd configuration unchanged. Finally it runs `make uninstall` and checks that every installed file is gone. Each distribution gets its own `CARGO_TARGET_DIR`, so binaries linked against one distribution's libraries are never reused in another.
 
 The Flatpak bundle is built from `page.codeberg.wvhulle.Lazaret.json`:
 
@@ -141,6 +141,6 @@ The steps:
 
 1. On every push to `main`, `.woodpecker/release.yaml` opens or updates a release pull request. It bumps the version from the conventional commits since the last tag and writes the changelog.
 2. Merging that pull request tags `v<version>` and creates a Codeberg release.
-3. The release starts `.woodpecker/debian-package.yaml`, which attaches `lazaret_<version>_amd64.deb`, and `.forgejo/workflows/flatpak.yaml`, which attaches `lazaret-x86_64.flatpak`. Each file gets a `.sha256` checksum and a `.minisig` signature next to it, made with the minisign key in the `minisign_secret_key` secret (Woodpecker) and `MINISIGN_SECRET_KEY` (Forgejo). Without that secret the upload fails rather than publishing unsigned files. The matching public key is `minisign.pub` in the repository root.
+3. The release starts `.forgejo/workflows/flatpak.yaml`, which attaches `lazaret-x86_64.flatpak` with a `.sha256` checksum and a `.minisig` signature next to it. The signature is made with the minisign key in the Forgejo secret `MINISIGN_SECRET_KEY`. Without that secret the upload fails rather than publishing an unsigned file. The matching public key is `minisign.pub` in the repository root.
 
 A weekly cron job, `.woodpecker/dependency-update-pr.yaml`, updates `Cargo.lock` and `flake.lock` on the `bot/dependency-updates` branch and opens a pull request. Everything automatic that pushes, opens pull requests or creates releases acts as `wvhulle-bot`, with the `bot_token` secret.

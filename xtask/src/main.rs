@@ -1,7 +1,6 @@
 mod cachix_closure_push;
 mod ci_tool_preparation;
 mod codeberg_bot_account;
-mod debian_package;
 mod dependency_update_pull_request;
 #[path = "../../src/host_services/lazaret_database/embedded_migration_lists.rs"]
 mod embedded_migration_lists;
@@ -13,6 +12,7 @@ mod page_screenshots;
 mod release_publishing;
 mod screenshot_fixtures;
 mod screenshot_publishing;
+mod source_install;
 mod task_failure;
 mod tool_commands;
 mod vm_fixture_corpus;
@@ -25,13 +25,13 @@ use clap::{Parser, Subcommand};
 use crate::{
     cachix_closure_push::{fetch_from_cache, push_build_closure},
     ci_tool_preparation::{check_commit_messages, download_tools, prepare_ci_tools},
-    debian_package::{build_debian_package, check_debian_package_install, ci_build_debian_package},
     dependency_update_pull_request::open_dependency_update_pull_request,
     fixture_clamav_programs::{invoked_as_fixture_program, run_fixture_program},
     flatpak_bundle::{build_flatpak_bundle, download_flatpak_dependencies},
     page_screenshots::{list_visible_widgets, render_page_screenshots},
     release_publishing::{ReleasePlzCommand, run_release_plz, upload_release_assets},
     screenshot_publishing::publish_screenshots,
+    source_install::check_source_install,
     task_failure::TaskFailure,
     vm_fixture_corpus::build_vm_fixture_corpus,
     vm_journeys::{
@@ -88,18 +88,7 @@ enum RepositoryTask {
     },
     PrepareCiTools,
     OpenDependencyUpdatePr,
-    BuildDebianPackage {
-        #[arg(default_value = "dist")]
-        output_directory: PathBuf,
-    },
-    CiBuildDebianPackage {
-        #[arg(default_value = "dist")]
-        output_directory: PathBuf,
-    },
-    CheckDebianPackageInstall {
-        #[arg(default_value = "dist")]
-        packages_directory: PathBuf,
-    },
+    CheckSourceInstall,
     DownloadFlatpakDependencies,
     BuildFlatpakBundle {
         #[arg(long)]
@@ -143,15 +132,7 @@ fn run_repository_task(repository_task: RepositoryTask) -> Result<(), TaskFailur
         } => download_tools(&binary_cache_url, &tool_installables),
         RepositoryTask::PrepareCiTools => prepare_ci_tools(),
         RepositoryTask::OpenDependencyUpdatePr => open_dependency_update_pull_request(),
-        RepositoryTask::BuildDebianPackage { output_directory } => {
-            build_debian_package(&output_directory)
-        }
-        RepositoryTask::CiBuildDebianPackage { output_directory } => {
-            ci_build_debian_package(&output_directory)
-        }
-        RepositoryTask::CheckDebianPackageInstall { packages_directory } => {
-            check_debian_package_install(&packages_directory)
-        }
+        RepositoryTask::CheckSourceInstall => check_source_install(),
         RepositoryTask::DownloadFlatpakDependencies => download_flatpak_dependencies(),
         RepositoryTask::BuildFlatpakBundle {
             skip_downloads,

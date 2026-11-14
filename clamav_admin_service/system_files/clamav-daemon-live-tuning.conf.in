@@ -3,5 +3,5 @@ Requires=lazaret-settings-merge.service
 After=lazaret-settings-merge.service
 
 [Service]
-BindReadOnlyPaths=-/run/lazaret/clamd.conf:/etc/clamav/clamd.conf
+BindReadOnlyPaths=-/run/lazaret/clamd.conf:@CLAMD_CONFIG@
 RuntimeDirectoryPreserve=yes

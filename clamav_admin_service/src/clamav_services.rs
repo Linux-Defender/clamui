@@ -1,5 +1,6 @@
 use std::{io, path::Path};
 
+use clamd_configuration::host_clamd_layout::{CLAMD_DAEMON_UNIT, CLAMONACC_UNIT};
 use futures::StreamExt;
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
@@ -11,8 +12,6 @@ const PING_REQUEST: &[u8] = b"zPING\0";
 const RELOAD_REQUEST: &[u8] = b"zRELOAD\0";
 const RELOADING_ANSWER_PREFIX: &[u8] = b"RELOADING";
 const PONG_ANSWER_PREFIX: &[u8] = b"PONG";
-const DAEMON_UNIT: &str = "clamav-daemon.service";
-const ON_ACCESS_UNIT: &str = "clamav-clamonacc.service";
 const SUCCESSFUL_JOB_RESULT: &str = "done";
 const REPLACING_JOB_MODE: &str = "replace";
 
@@ -159,11 +158,11 @@ async fn clamd_answers_ping_unless_unit_stops(
             if ping_answer.is_ok_and(|answer_bytes| answer_bytes.starts_with(PONG_ANSWER_PREFIX)) {
                 ServicesReadiness::ServicesReady
             } else {
-                ServicesReadiness::ServiceNotReady { unit_name: DAEMON_UNIT }
+                ServicesReadiness::ServiceNotReady { unit_name: CLAMD_DAEMON_UNIT }
             }
         ),
         unit_stopped = unit_stops(daemon_proxy) => unit_stopped.map(|()| {
-            ServicesReadiness::ServiceNotReady { unit_name: DAEMON_UNIT }
+            ServicesReadiness::ServiceNotReady { unit_name: CLAMD_DAEMON_UNIT }
         }),
     }
 }
@@ -199,13 +198,13 @@ impl ClamavServices for SystemClamavServices<'_> {
             .await
             .map_err(dbus_failure)?;
         systemd_manager.subscribe().await.map_err(dbus_failure)?;
-        let daemon_proxy = unit_proxy_for(&bus_connection, &systemd_manager, DAEMON_UNIT).await?;
+        let daemon_proxy = unit_proxy_for(&bus_connection, &systemd_manager, CLAMD_DAEMON_UNIT).await?;
         let on_access_proxy =
-            unit_proxy_for(&bus_connection, &systemd_manager, ON_ACCESS_UNIT).await?;
+            unit_proxy_for(&bus_connection, &systemd_manager, CLAMONACC_UNIT).await?;
         let on_access_activity = current_activity(&on_access_proxy).await?;
         if current_activity(&daemon_proxy).await? == UnitActivity::RunningOrStarting {
             let daemon_readiness =
-                restart_unit_and_wait_for_job(&systemd_manager, DAEMON_UNIT).await?;
+                restart_unit_and_wait_for_job(&systemd_manager, CLAMD_DAEMON_UNIT).await?;
             if daemon_readiness != ServicesReadiness::ServicesReady {
                 return Ok(daemon_readiness);
             }
@@ -216,7 +215,7 @@ impl ClamavServices for SystemClamavServices<'_> {
             }
         }
         if on_access_activity == UnitActivity::RunningOrStarting {
-            return restart_unit_and_wait_for_job(&systemd_manager, ON_ACCESS_UNIT).await;
+            return restart_unit_and_wait_for_job(&systemd_manager, CLAMONACC_UNIT).await;
         }
         Ok(ServicesReadiness::ServicesReady)
     }
