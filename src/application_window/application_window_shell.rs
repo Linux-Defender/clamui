@@ -370,6 +370,9 @@ impl AsyncComponent for ApplicationWindowShell {
         };
         let content_widget = model.window_content.content_widget(&model.message_catalog);
         let widgets = view_output!();
+        if cfg!(debug_assertions) {
+            root.add_css_class("devel");
+        }
         let tray_shell_sender = sender.input_sender().clone();
         let tray_menu_labels = TrayMenuLabels::from(&*model.message_catalog);
         sender.oneshot_command(async move {
