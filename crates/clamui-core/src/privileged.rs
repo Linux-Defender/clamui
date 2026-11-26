@@ -988,12 +988,7 @@ pub fn verify_staging_root(root: &Path, expected_uid: u32) -> AppResult<()> {
         .read(true)
         .custom_flags(O_NOFOLLOW | O_DIRECTORY)
         .open(root)
-        .map_err(|error| {
-            format!(
-                "cannot safely open staging root {}: {error}",
-                root.display()
-            )
-        })?;
+        .map_err(|_| "cannot safely open staging root".to_owned())?;
     verify_owned_tight_directory(&file, expected_uid, root)
 }
 
